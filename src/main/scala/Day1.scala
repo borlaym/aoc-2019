@@ -1,4 +1,3 @@
-package com.borlaym.aoc
 import scala.io.Source
 
 object Day1 {

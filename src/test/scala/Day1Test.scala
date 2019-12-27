@@ -1,4 +1,3 @@
-import com.borlaym.aoc.Day1
 import org.scalatest.FunSuite
 
 class Day1Test extends FunSuite {
