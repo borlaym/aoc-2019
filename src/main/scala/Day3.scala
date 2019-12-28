@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 final case class Segment (
      startX: Int,
      startY: Int,
@@ -7,6 +9,11 @@ final case class Segment (
 	lazy val vector: (Int, Int) = (endX - startX, endY - startY)
 	lazy val startPoint = (startX, startY)
 	lazy val endPoint = (endX, endY)
+	lazy val length = Math.sqrt(vector._1 * vector._1 + vector._2 * vector._2)
+	def lengthUtilPoint(point: (Int, Int)): Double = {
+		val partialVector = (point._1 - startX, point._2 - startY)
+		Math.sqrt(partialVector._1 * partialVector._1 + partialVector._2 * partialVector._2)
+	}
 }
 
 object Day3 {
@@ -54,8 +61,25 @@ object Day3 {
 			val list = status._1
 			val pointer = status._2
 			val newSegment = getSegment(pointer, command)
-			(newSegment :: list, newSegment.endPoint)
+			(list :+ newSegment, newSegment.endPoint)
 		})._1
+	}
+
+	def wireLength(wire: List[Segment]): Double = {
+		wire match {
+			case segment :: rest => segment.length + wireLength(rest)
+			case segment :: Nil => segment.length
+			case Nil => 0
+		}
+	}
+
+	def wireLengthUntil(wire: List[Segment], targetSegment: Segment, intersectionPoint: (Int, Int)): Double = {
+		wire match {
+			case segment :: _ if segment == targetSegment => targetSegment.lengthUtilPoint(intersectionPoint)
+			case segment :: rest => segment.length + wireLengthUntil(rest, targetSegment, intersectionPoint)
+			case segment :: Nil => segment.length
+			case Nil => 0
+		}
 	}
 
 	def main(args: Array[String]): Unit = {
@@ -65,8 +89,15 @@ object Day3 {
 			segment1 <- wire1
 			segment2 <- wire2
 			intersects <- intersection(segment1, segment2)
-		} yield intersects
-		println(intersections)
-		println(intersections.map(i => Math.abs(i._1) + Math.abs(i._2)))
+		} yield (intersects, segment1, segment2)
+		println(intersections.map(ixData => {
+			val intersectionPoint = ixData._1
+			val wire1Segment = ixData._2
+			val wire2Segment = ixData._3
+			val wire1Length: Double = wireLengthUntil(wire1, wire1Segment, intersectionPoint)
+			val wire2Length: Double = wireLengthUntil(wire2, wire2Segment, intersectionPoint)
+			(wire1Length + wire2Length).toInt
+		}))
+
 	}
 }

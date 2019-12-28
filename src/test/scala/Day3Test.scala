@@ -17,6 +17,19 @@ class Day3Test extends FunSuite {
 	}
 
 	test("Day3.getSegments") {
-		assert(Day3.getSegments("U10,R4") == List(new Segment(0, 10, 4, 10), new Segment(0, 0, 0, 10)))
+		assert(Day3.getSegments("U10,R4") == List(new Segment(0, 0, 0, 10), new Segment(0, 10, 4, 10)))
+	}
+
+	test("Day3.wireLength") {
+		assert(Day3.wireLength(
+			List(new Segment(0, 0, 10, 0), new Segment(10, 0, 10, 5))
+		) === 15)
+	}
+	test("Day3.wireLengthUntil") {
+		assert(Day3.wireLengthUntil(
+			List(new Segment(0, 0, 10, 0), new Segment(10, 0, 10, 5), new Segment(10, 5, 10, 10)),
+			new Segment(10, 0, 10, 5),
+			(10, 3)
+		) === 13)
 	}
 }
