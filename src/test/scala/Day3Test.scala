@@ -11,4 +11,8 @@ class Day3Test extends FunSuite {
 			new Segment(5, 2, 5, -2)
 		) === Some((5, 1)))
 	}
+	test("Day3.getSegment") {
+		assert(Day3.getSegment((2, 2), "U10") == new Segment(2, 2, 2, 12))
+		assert(Day3.getSegment((2, 2), "L10") == new Segment(2, 2, -8, 2))
+	}
 }

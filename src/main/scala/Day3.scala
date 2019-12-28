@@ -34,4 +34,21 @@ object Day3 {
 		}
 
 	}
+
+	/**
+	  * Given a start point and a command like U10, return a line segment
+	  */
+	def getSegment(startPoint: (Int, Int), command: String): Segment = {
+		val parsedCommand = raw"([UDLR])(\d+)".r
+		command match {
+			case parsedCommand("U", amount) => new Segment(startPoint._1, startPoint._2, startPoint._1, startPoint._2 + amount.toInt)
+			case parsedCommand("D", amount) => new Segment(startPoint._1, startPoint._2, startPoint._1, startPoint._2 - amount.toInt)
+			case parsedCommand("L", amount) => new Segment(startPoint._1, startPoint._2, startPoint._1 - amount.toInt, startPoint._2)
+			case parsedCommand("R", amount) => new Segment(startPoint._1, startPoint._2, startPoint._1 + amount.toInt, startPoint._2)
+		}
+	}
+
+	def main(args: Array[String]): Unit = {
+
+	}
 }
