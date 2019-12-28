@@ -1,10 +1,14 @@
 object Day4 {
+	def splitCode(code: Int): List[List[Char]] = {
+		code.toString.toList.foldLeft(List[List[Char]]())((acc, char) => {
+			acc match {
+				case Nil => List(List(char))
+				case head :: tail => if (head.head == char) (char :: head) :: tail else List(char) :: (head :: tail)
+			}
+		})
+	}
 	def containsDouble(code: Int): Boolean = {
-		code % 10 == (code / 10) % 10 ||
-		(code / 10) % 10 == (code / 100) % 10 ||
-		(code / 100) % 10 == (code / 1000) % 10 ||
-		(code / 1000) % 10 == (code / 10000) % 10 ||
-		(code / 10000) % 10 == (code / 100000) % 10
+		splitCode(code).exists(_.length == 2)
 	}
 	def getValidCodes() = {
 		val allCodes = for {
