@@ -13,11 +13,13 @@ object IntCode2 {
 			// 0 means position mode (read from address), 1 means immediate mode (read value)
 			val parameter1Mode = ((operationData / 100) % 10).toInt
 			val parameter2Mode = ((operationData / 1000) % 10).toInt
+			val parameter3Mode = ((operationData / 10000) % 10).toInt
 			operation match {
 				// Addition
 				case 1 => {
 					val arg1 = listValue(pointer + 1)
 					val arg2 = listValue(pointer + 2)
+					val arg3 = listValue(pointer + 3)
 					val arg1Value = parameter1Mode match {
 						case 0 => listValue(arg1.toInt)
 						case 1 => arg1
@@ -28,13 +30,17 @@ object IntCode2 {
 						case 1 => arg2
 						case 2 => listValue(relativeBase + arg2.toInt)
 					}
-					val target = listValue(pointer + 3).toInt // Target is never in immediate mode
-					runOperation(list.updated(target, arg1Value + arg2Value), pointer + 4, inputStack, output, relativeBase)
+					val targetAddress = parameter3Mode match {
+						case 0 => arg3
+						case 2 => relativeBase + arg3
+					}
+					runOperation(list.updated(targetAddress.toInt, arg1Value + arg2Value), pointer + 4, inputStack, output, relativeBase)
 				}
 				// Multiplication
 				case 2 => {
 					val arg1 = listValue(pointer + 1)
 					val arg2 = listValue(pointer + 2)
+					val arg3 = listValue(pointer + 3)
 					val arg1Value = parameter1Mode match {
 						case 0 => listValue(arg1.toInt)
 						case 1 => arg1
@@ -45,13 +51,20 @@ object IntCode2 {
 						case 1 => arg2
 						case 2 => listValue(relativeBase + arg2.toInt)
 					}
-					val target = listValue(pointer + 3).toInt
-					runOperation(list.updated(target, arg1Value * arg2Value), pointer + 4, inputStack, output, relativeBase)
+					val targetAddress = parameter3Mode match {
+						case 0 => arg3
+						case 2 => relativeBase + arg3
+					}
+					runOperation(list.updated(targetAddress.toInt, arg1Value * arg2Value), pointer + 4, inputStack, output, relativeBase)
 				}
 				// Save Input
 				case 3 => {
-					val target = listValue(pointer + 1).toInt
-					runOperation(list.updated(target, inputStack.head), pointer + 2, inputStack.tail, output, relativeBase)
+					val arg1 = listValue(pointer + 1)
+					val targetAddress = parameter1Mode match {
+						case 0 => arg1
+						case 2 => relativeBase + arg1
+					}
+					runOperation(list.updated(targetAddress.toInt, inputStack.head), pointer + 2, inputStack.tail, output, relativeBase)
 				}
 				// Output
 				case 4 => {
@@ -107,6 +120,7 @@ object IntCode2 {
 				case 7 => {
 					val arg1 = listValue(pointer + 1)
 					val arg2 = listValue(pointer + 2)
+					val arg3 = listValue(pointer + 3)
 					val arg1Value = parameter1Mode match {
 						case 0 => listValue(arg1.toInt)
 						case 1 => arg1
@@ -117,14 +131,18 @@ object IntCode2 {
 						case 1 => arg2
 						case 2 => listValue(relativeBase + arg2.toInt)
 					}
-					val target = listValue(pointer + 3).toInt // Target is never in immediate mode
+					val targetAddress = parameter3Mode match {
+						case 0 => arg3
+						case 2 => relativeBase + arg3
+					}
 					val targetValue = if (arg1Value < arg2Value) 1 else 0
-					runOperation(list.updated(target, targetValue), pointer + 4, inputStack, output, relativeBase)
+					runOperation(list.updated(targetAddress.toInt, targetValue), pointer + 4, inputStack, output, relativeBase)
 				}
 				// Equals
 				case 8 => {
 					val arg1 = listValue(pointer + 1)
 					val arg2 = listValue(pointer + 2)
+					val arg3 = listValue(pointer + 3)
 					val arg1Value = parameter1Mode match {
 						case 0 => listValue(arg1.toInt)
 						case 1 => arg1
@@ -135,9 +153,12 @@ object IntCode2 {
 						case 1 => arg2
 						case 2 => listValue(relativeBase + arg2.toInt)
 					}
-					val target = listValue(pointer + 3).toInt // Target is never in immediate mode
+					val targetAddress = parameter3Mode match {
+						case 0 => arg3
+						case 2 => relativeBase + arg3
+					}
 					val targetValue = if (arg1Value == arg2Value) 1 else 0
-					runOperation(list.updated(target, targetValue), pointer + 4, inputStack, output, relativeBase)
+					runOperation(list.updated(targetAddress.toInt, targetValue), pointer + 4, inputStack, output, relativeBase)
 				}
 				// Change relative base value
 				case 9 => {
